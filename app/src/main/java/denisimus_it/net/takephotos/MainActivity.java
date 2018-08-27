@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 1;
 
     private ImageView imageViewFoto;
@@ -62,18 +61,18 @@ public class MainActivity extends AppCompatActivity {
         String timeStamp = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
+        } else {
+            timeStamp = String.valueOf(System.currentTimeMillis());
         }
-
-        String imageFileName = "JPEG_" + System.currentTimeMillis() + "_";
+        String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir
+        );
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
-
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -84,20 +83,18 @@ public class MainActivity extends AppCompatActivity {
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
+                // Error occurred while creating the File
                 Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
-//                ex.getCause();
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                 photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
+                photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.provider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
-
-
     }
 
 
